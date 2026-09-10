@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPM Admin — Mockup</title>
+<style>
+  :root{
+    --blue:#1D4FC4;
+    --blue-light:#EAF0FD;
+    --bg:#F5F6F8;
+    --card:#FFFFFF;
+    --line:#E2E4E9;
+    --text-1:#1A1D23;
+    --text-2:#666B75;
+    --text-3:#9A9EA8;
+    --danger:#C0392B;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background:#DADCE0;
+    padding:30px 16px;
+    color:var(--text-1);
+    font-size:14px;
+  }
+  .browser{
+    max-width:1180px;
+    margin:0 auto;
+    background:#fff;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,0.2);
+  }
+  .browser-bar{
+    background:#E9EAED;
+    padding:10px 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    border-bottom:1px solid #D5D7DB;
+  }
+  .dot{ width:11px; height:11px; border-radius:50%; }
+  .dot.red{ background:#FF5F57; }
+  .dot.yellow{ background:#FEBC2E; }
+  .dot.green{ background:#28C840; }
+  .url-bar{ flex:1; background:#fff; border-radius:6px; padding:5px 12px; font-size:12px; color:var(--text-2); margin-left:10px; }
+
+  .app{ display:flex; min-height:660px; position:relative; }
+
+  .menu-toggle{
+    display:none; position:absolute; top:14px; left:14px; z-index:20;
+    width:34px; height:34px; border-radius:8px; border:1px solid var(--line);
+    background:#fff; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .sidebar-overlay{ display:none; position:fixed; inset:0; background:rgba(20,22,26,0.4); z-index:15; }
+  .sidebar-overlay.open{ display:block; }
+
+  @media (max-width: 760px){
+    .browser{ border-radius:0; }
+    .app{ min-height:100vh; }
+    .menu-toggle{ display:flex; }
+    .sidebar{
+      position:fixed; top:0; left:0; bottom:0; width:78%; max-width:300px; z-index:20;
+      transform:translateX(-100%); transition:transform .25s ease; box-shadow:0 0 24px rgba(0,0,0,0.15);
+    }
+    .sidebar.open{ transform:translateX(0); }
+    .main{ padding:64px 16px 24px; width:100%; }
+    .profile-header{ flex-wrap:wrap; }
+    .profile-actions{ margin-left:0; width:100%; }
+    .profile-actions .btn{ flex:1; }
+    .tab-row{ overflow-x:auto; white-space:nowrap; }
+    thead{ display:none; }
+    table, tbody, tr, td{ display:block; width:100%; }
+    tbody tr{ border:1px solid var(--line); border-radius:8px; margin-bottom:10px; padding:6px 0; }
+    tbody td{ display:flex; justify-content:space-between; gap:10px; border-bottom:1px solid #F2F3F5; white-space:normal; text-align:right; }
+    tbody td:last-child{ border-bottom:none; justify-content:flex-end; }
+    tbody td:before{ content:attr(data-label); font-weight:600; color:var(--text-3); font-size:11px; text-align:left; }
+    table{ border:none; }
+  }
+
+  .sidebar{ width:280px; background:#fff; border-right:1px solid var(--line); flex-shrink:0; display:flex; flex-direction:column; }
+  .sidebar-logo{ display:flex; align-items:center; gap:10px; padding:16px 18px; border-bottom:1px solid var(--line); }
+  .sidebar-logo-mark{ width:30px; height:30px; border-radius:8px; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+  .sidebar-logo-text{ font-size:13px; font-weight:600; line-height:1.3; }
+  .sidebar-logo-text span{ display:block; font-size:10.5px; color:var(--text-3); font-weight:400; }
+
+  .sidebar-search{ padding:12px 14px; border-bottom:1px solid var(--line); }
+  .sidebar-search input{ width:100%; padding:8px 11px; border:1px solid var(--line); border-radius:7px; font-size:13px; font-family:inherit; outline:none; }
+  .sidebar-search input:focus{ border-color:var(--blue); }
+  .sidebar-addbtn{ margin:10px 14px 6px; padding:8px; border-radius:7px; border:1px dashed var(--line); background:#fff; color:var(--blue); font-size:12.5px; font-weight:600; text-align:center; cursor:pointer; }
+  .sidebar-addbtn:hover{ background:var(--blue-light); }
+
+  .customer-list{ flex:1; overflow-y:auto; padding:4px 8px 12px; }
+  .customer-item{ display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; cursor:pointer; }
+  .customer-item:hover{ background:#FAFAFB; }
+  .customer-item.active{ background:var(--blue-light); }
+  .customer-avatar{ width:36px; height:36px; border-radius:50%; background:#EDEFF2; color:var(--blue); display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; flex-shrink:0; }
+  .customer-item.active .customer-avatar{ background:var(--blue); color:#fff; }
+  .customer-info{ min-width:0; flex:1; }
+  .customer-name{ font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .customer-company{ font-size:11.5px; color:var(--text-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .customer-badge{ font-size:10px; color:var(--text-3); flex-shrink:0; }
+
+  .main{ flex:1; padding:24px 28px; overflow-y:auto; }
+
+  .empty-state{ display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--text-3); text-align:center; padding:60px 20px; }
+  .empty-state svg{ margin-bottom:14px; }
+  .empty-state-title{ font-size:14px; font-weight:600; color:var(--text-2); margin-bottom:4px; }
+  .empty-state-sub{ font-size:12.5px; }
+
+  .profile-header{ display:flex; align-items:flex-start; gap:16px; margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid var(--line); }
+  .profile-avatar{ width:56px; height:56px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; flex-shrink:0; }
+  .profile-name{ font-size:18px; font-weight:700; }
+  .profile-company{ font-size:13px; color:var(--text-2); margin-top:1px; }
+  .profile-meta{ display:flex; gap:16px; margin-top:8px; flex-wrap:wrap; }
+  .profile-meta-item{ font-size:12px; color:var(--text-2); display:flex; align-items:center; gap:5px; }
+  .profile-meta-item span{ color:var(--text-1); font-weight:600; }
+  .profile-actions{ margin-left:auto; display:flex; gap:8px; flex-shrink:0; }
+
+  .btn{ padding:8px 14px; border-radius:7px; border:1px solid var(--line); background:#fff; font-size:13px; font-weight:600; cursor:pointer; color:var(--text-1); white-space:nowrap; }
+  .btn:hover{ background:#FAFAFB; }
+  .btn-primary{ background:var(--blue); color:#fff; border-color:var(--blue); }
+  .btn-primary:hover{ background:#173F9E; }
+  .btn-sm{ padding:6px 11px; font-size:12px; }
+
+  .tab-row{ display:flex; gap:4px; margin-bottom:16px; border-bottom:1px solid var(--line); }
+  .tab-item{ padding:9px 14px; font-size:13px; font-weight:600; color:var(--text-2); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; }
+  .tab-item.active{ color:var(--blue); border-bottom-color:var(--blue); }
+  .tab-item .count{ color:var(--text-3); font-weight:400; margin-left:3px; }
+
+  .section-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .section-title{ font-size:14px; font-weight:600; }
+
+  table{ width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  thead th{ text-align:left; font-size:11.5px; color:var(--text-3); font-weight:600; padding:9px 12px; background:#FAFAFB; border-bottom:1px solid var(--line); white-space:nowrap; }
+  tbody td{ padding:10px 12px; border-bottom:1px solid var(--line); font-size:12.5px; vertical-align:middle; white-space:nowrap; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:#FAFBFC; }
+  .badge{ font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:6px; white-space:nowrap; display:inline-block; }
+  .badge-blue{ background:var(--blue-light); color:var(--blue); }
+  .badge-gray{ background:#F0F1F3; color:var(--text-2); }
+  .badge-amber{ background:#FBF0DC; color:#8A5A05; }
+  .row-actions{ display:flex; gap:6px; }
+  .icon-btn{ width:26px; height:26px; border-radius:6px; border:1px solid var(--line); background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-2); }
+  .icon-btn:hover{ background:#FAFAFB; }
+  .icon-btn.danger:hover{ background:#FDEDEB; color:var(--danger); border-color:#F3C9C2; }
+  .table-wrap{ overflow-x:auto; }
+
+  .modal-overlay{ position:fixed; inset:0; background:rgba(20,22,26,0.45); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal-overlay.open{ display:flex; }
+  .modal{ background:#fff; border-radius:10px; width:100%; max-width:480px; max-height:85vh; overflow-y:auto; padding:22px; }
+  .modal-title{ font-size:16px; font-weight:700; margin-bottom:4px; }
+  .modal-sub{ font-size:12.5px; color:var(--text-2); margin-bottom:18px; }
+  .form-group{ margin-bottom:12px; }
+  .form-label{ font-size:12.5px; color:var(--text-2); margin-bottom:5px; display:block; font-weight:500; }
+  .form-input, .form-select, .form-textarea{ width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:7px; font-size:13.5px; font-family:inherit; outline:none; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus{ border-color:var(--blue); }
+  .form-textarea{ resize:vertical; min-height:64px; }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
+
+  /* auth gate */
+  .auth-screen{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:660px; padding:40px 24px; text-align:center;
+  }
+  .auth-logo{ width:56px; height:56px; border-radius:14px; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; margin-bottom:20px; }
+  .auth-title{ font-size:19px; font-weight:700; margin-bottom:6px; }
+  .auth-sub{ font-size:13px; color:var(--text-2); max-width:320px; line-height:1.6; margin-bottom:28px; }
+  .google-btn{
+    display:flex; align-items:center; gap:10px; padding:11px 22px; border-radius:8px;
+    border:1px solid var(--line); background:#fff; font-size:14px; font-weight:600; color:var(--text-1);
+    cursor:pointer; font-family:inherit;
+  }
+  .google-btn:hover{ background:#FAFAFB; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+  .auth-note{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-3); margin-top:24px; max-width:300px; }
+  .auth-error{
+    display:none; background:#FDEDEB; border:1px solid #F3C9C2; color:#A73B3B; font-size:12.5px;
+    padding:10px 14px; border-radius:8px; margin-top:16px; max-width:320px;
+  }
+  .auth-error.show{ display:block; }
+
+  .admin-account{ padding:10px 14px; border-top:1px solid var(--line); display:flex; align-items:center; gap:10px; }
+  .admin-account-avatar{ width:28px; height:28px; border-radius:50%; background:var(--blue-light); color:var(--blue); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+  .admin-account-email{ font-size:11.5px; color:var(--text-2); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .admin-signout{ font-size:11.5px; color:var(--blue); font-weight:600; cursor:pointer; flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<div class="browser">
+  <div class="browser-bar">
+    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+    <div class="url-bar">admin.spmintercool.com</div>
+  </div>
+
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-logo">SPM</div>
+    <div class="auth-title">SPM Admin</div>
+    <div class="auth-sub">พื้นที่นี้เป็นข้อมูลลูกค้าที่เชื่อมกับ Google Sheets โดยตรง กรุณาเข้าสู่ระบบด้วยบัญชี Google ที่ได้รับอนุญาตเท่านั้น</div>
+
+    <button class="google-btn" onclick="signInWithGoogle()">
+      <svg width="18" height="18" viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.3 1 7.3 2.8l5.7-5.7C33.6 6.5 29 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.3-.4-3.5z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c2.8 0 5.3 1 7.3 2.8l5.7-5.7C33.6 6.5 29 4.5 24 4.5c-7.6 0-14.1 4.3-17.4 10.6z"/>
+        <path fill="#4CAF50" d="M24 43.5c5 0 9.5-1.9 12.9-5l-6-5c-1.9 1.3-4.3 2-6.9 2-5.3 0-9.7-2.6-11.3-6.9l-6.5 5C9.8 39.1 16.4 43.5 24 43.5z"/>
+        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.5l6 5c-.4.3 6.9-4.9 6.9-15.5 0-1.2-.1-2.3-.4-3.5z"/>
+      </svg>
+      เข้าสู่ระบบด้วย Google
+    </button>
+
+    <div class="auth-error" id="authError">อีเมลนี้ไม่ได้รับอนุญาตให้เข้าถึงระบบแอดมิน กรุณาติดต่อผู้ดูแลระบบ</div>
+
+    <div class="auth-note">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+      จำกัดเฉพาะอีเมลที่อยู่ในรายชื่อที่ได้รับอนุญาตเท่านั้น
+    </div>
+  </div>
+
+  <div class="app hidden" id="appRoot">
+    <div class="menu-toggle" onclick="toggleSidebar()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-mark">SPM</div>
+        <div class="sidebar-logo-text">SPM Admin<span>Intercool Co., Ltd.</span></div>
+      </div>
+      <div class="sidebar-search">
+        <input type="text" placeholder="ค้นหาชื่อลูกค้า, บริษัท..." oninput="filterCustomers(this.value)">
+      </div>
+      <div class="sidebar-addbtn" onclick="openModal('newCustomer')">+ เพิ่มลูกค้าใหม่</div>
+
+      <div class="customer-list" id="customerList"></div>
+
+      <div class="admin-account">
+        <div class="admin-account-avatar" id="adminAvatar">A</div>
+        <div class="admin-account-email" id="adminEmail">admin@spmintercool.com</div>
+        <div class="admin-signout" onclick="signOutAdmin()">ออก</div>
+      </div>
+    </div>
+
+    <div class="main" id="main"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<script>
+// ---- Google sign-in gate ----
+// NOTE: this allowedAdminEmails check still runs in the browser, so it only gates the UI.
+// For real protection, also restrict access at the data layer (Firestore Security Rules
+// and/or checking the signed-in email inside the Apps Script doGet/doPost handlers).
+const allowedAdminEmails = ['owner@spmintercool.com', 'admin@spmintercool.com'];
+
+const customers = {
+  c1: {
+    name:'คุณสมชาย ใจดี', company:'บริษัท ไทยฟู้ดส์ จำกัด', initials:'สช',
+    username:'somchai', email:'somchai@thaifoods.co.th', custId:'CUST-00214', phone:'081-234-5678', password:'',
+    appointments:[
+      {date:'15 ก.ย. 2569', time:'09:30 น.', detail:'บำรุงรักษาเครื่องตัดผ้า #A102', service:'SV-2569-0142', status:'ยืนยันแล้ว'},
+      {date:'22 ก.ย. 2569', time:'13:00 น.', detail:'ตรวจเช็คมอเตอร์ประจำปี', service:'SV-2569-0158', status:'รอยืนยัน'}
+    ],
+    machines:[
+      {model:'CR-4500', serial:'CR4500-2201-089', warranty:'10 ม.ค. 2568', roomType:'ห้องเย็นควบคุมอุณหภูมิ', refrigerant:'R404A', notes:'ติดตั้งพร้อมระบบสำรองไฟ'},
+      {model:'FR-220', serial:'FR220-2019-014', warranty:'3 มี.ค. 2562', roomType:'ห้องแช่แข็ง', refrigerant:'R22', notes:'-'}
+    ],
+    repairs:[
+      {issue:'สายพานเครื่องปักขาด', date:'2 ก.ย. 2569', tech:'คุณวินัย ใจดี', status:'เสร็จสิ้น', service:'SV-2569-0098', detail:'เปลี่ยนสายพานใหม่และปรับตั้งความตึง'},
+      {issue:'คอมเพรสเซอร์เสียงดังผิดปกติ', date:'8 ก.ย. 2569', tech:'คุณอนันต์ สุขใจ', status:'กำลังดำเนินการ', service:'SV-2569-0161', detail:'อยู่ระหว่างตรวจสอบและสั่งอะไหล่ทดแทน'}
+    ]
+  },
+  c2: {
+    name:'คุณประภา วงศ์เจริญ', company:'ร้านอาหารทะเลสด ประภา', initials:'ปภ',
+    username:'prapha', email:'prapha@seafoodshop.co.th', custId:'CUST-00229', phone:'089-555-1234', password:'',
+    appointments:[
+      {date:'18 ก.ย. 2569', time:'10:00 น.', detail:'ตรวจเช็คตู้แช่ประจำเดือน', service:'SV-2569-0170', status:'ยืนยันแล้ว'}
+    ],
+    machines:[
+      {model:'FR-150', serial:'FR150-2020-055', warranty:'1 ส.ค. 2566', roomType:'ตู้แช่แข็ง', refrigerant:'R134A', notes:'-'}
+    ],
+    repairs:[
+      {issue:'น้ำยาแอร์รั่ว เติมน้ำยาเพิ่ม', date:'19 ส.ค. 2569', tech:'คุณวินัย ใจดี', status:'เสร็จสิ้น', service:'SV-2569-0071', detail:'เติมน้ำยาและตรวจสอบจุดรั่ว'}
+    ]
+  }
+};
+
+let activeCustomer = null;
+let activeTab = 'appointments';
+let modalContext = { type:null, index:null };
+let customerCounter = 3;
+
+function renderCustomerList(filter){
+  const list = document.getElementById('customerList');
+  const q = (filter||'').trim().toLowerCase();
+  list.innerHTML = Object.keys(customers).map(id=>{
+    const c = customers[id];
+    const searchable = (c.name+' '+c.company).toLowerCase();
+    if(q && !searchable.includes(q)) return '';
+    const isActive = id===activeCustomer ? ' active' : '';
+    return '<div class="customer-item'+isActive+'" onclick="selectCustomer(\''+id+'\')">'+
+      '<div class="customer-avatar">'+c.initials+'</div>'+
+      '<div class="customer-info">'+
+        '<div class="customer-name">'+c.name+'</div>'+
+        '<div class="customer-company">'+c.company+'</div>'+
+      '</div>'+
+      '<div class="customer-badge">'+c.appointments.length+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function filterCustomers(q){ renderCustomerList(q); }
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+function selectCustomer(id){
+  activeCustomer = id;
+  activeTab = 'appointments';
+  renderCustomerList();
+  renderMain();
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+function renderMain(){
+  const main = document.getElementById('main');
+  if(!activeCustomer){
+    main.innerHTML =
+      '<div class="empty-state">'+
+        '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'+
+        '<div class="empty-state-title">เลือกลูกค้าจากรายการด้านซ้าย</div>'+
+        '<div class="empty-state-sub">หรือค้นหาชื่อลูกค้า/บริษัทเพื่อเปิดดูข้อมูลทั้งหมดของลูกค้าคนนั้น</div>'+
+      '</div>';
+    return;
+  }
+  const c = customers[activeCustomer];
+  main.innerHTML =
+    '<div class="profile-header">'+
+      '<div class="profile-avatar">'+c.initials+'</div>'+
+      '<div>'+
+        '<div class="profile-name">'+c.name+'</div>'+
+        '<div class="profile-company">'+c.company+'</div>'+
+        '<div class="profile-meta">'+
+          '<div class="profile-meta-item">รหัสลูกค้า <span>'+c.custId+'</span></div>'+
+          '<div class="profile-meta-item">เบอร์โทร <span>'+c.phone+'</span></div>'+
+          '<div class="profile-meta-item">Username <span>'+c.username+'</span></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="profile-actions">'+
+        '<button class="btn btn-sm" onclick="openModal(\'setPassword\')">ตั้งรหัสผ่านใหม่</button>'+
+        '<button class="btn btn-sm" onclick="openModal(\'editCustomer\')">แก้ไขข้อมูลลูกค้า</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="tab-row">'+
+      '<div class="tab-item'+(activeTab==='appointments'?' active':'')+'" onclick="switchTab(\'appointments\', event)">นัดหมาย<span class="count">('+c.appointments.length+')</span></div>'+
+      '<div class="tab-item'+(activeTab==='machines'?' active':'')+'" onclick="switchTab(\'machines\', event)">เครื่องจักร<span class="count">('+c.machines.length+')</span></div>'+
+      '<div class="tab-item'+(activeTab==='repairs'?' active':'')+'" onclick="switchTab(\'repairs\', event)">ประวัติการซ่อม<span class="count">('+c.repairs.length+')</span></div>'+
+    '</div>'+
+    '<div id="tabContent"></div>';
+
+  renderTabContent();
+}
+
+function switchTab(tab, evt){
+  activeTab = tab;
+  renderTabContent();
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  if(evt && evt.target) evt.target.classList.add('active');
+}
+
+function statusBadge(s){
+  if(s==='ยืนยันแล้ว' || s==='เสร็จสิ้น') return '<span class="badge badge-blue">'+s+'</span>';
+  if(s==='กำลังดำเนินการ') return '<span class="badge badge-amber">'+s+'</span>';
+  return '<span class="badge badge-gray">'+s+'</span>';
+}
+
+function renderTabContent(){
+  const c = customers[activeCustomer];
+  const el = document.getElementById('tabContent');
+  if(activeTab==='appointments'){
+    el.innerHTML =
+      '<div class="section-toolbar"><div class="section-title">นัดหมายของลูกค้า</div><button class="btn btn-primary btn-sm" onclick="openModal(\'appointments\')">+ เพิ่มนัดหมาย</button></div>'+
+      '<div class="table-wrap"><table><thead><tr><th>วันที่</th><th>เวลา</th><th>รายละเอียด</th><th>Service No.</th><th>สถานะ</th><th></th></tr></thead><tbody>'+
+      c.appointments.map((a,i)=>'<tr><td data-label="วันที่">'+a.date+'</td><td data-label="เวลา">'+a.time+'</td><td data-label="รายละเอียด">'+a.detail+'</td><td data-label="Service No.">'+a.service+'</td><td data-label="สถานะ">'+statusBadge(a.status)+'</td>'+rowActionsHtml('appointments', i)+'</tr>').join('')+
+      '</tbody></table></div>';
+  } else if(activeTab==='machines'){
+    el.innerHTML =
+      '<div class="section-toolbar"><div class="section-title">เครื่องจักรของลูกค้า</div><button class="btn btn-primary btn-sm" onclick="openModal(\'machines\')">+ เพิ่มเครื่องจักร</button></div>'+
+      '<div class="table-wrap"><table><thead><tr><th>รุ่นเครื่อง</th><th>Serial Number</th><th>วันที่เริ่มรับประกัน</th><th>ประเภทห้องเย็น</th><th>น้ำยาที่ใช้</th><th>อื่นๆ</th><th></th></tr></thead><tbody>'+
+      c.machines.map((m,i)=>'<tr><td data-label="รุ่นเครื่อง">'+m.model+'</td><td data-label="Serial Number">'+m.serial+'</td><td data-label="วันที่เริ่มรับประกัน">'+m.warranty+'</td><td data-label="ประเภทห้องเย็น">'+m.roomType+'</td><td data-label="น้ำยาที่ใช้">'+m.refrigerant+'</td><td data-label="อื่นๆ">'+m.notes+'</td>'+rowActionsHtml('machines', i)+'</tr>').join('')+
+      '</tbody></table></div>';
+  } else {
+    el.innerHTML =
+      '<div class="section-toolbar"><div class="section-title">ประวัติการซ่อมของลูกค้า</div><button class="btn btn-primary btn-sm" onclick="openModal(\'repair\')">+ เพิ่มบันทึกการซ่อม</button></div>'+
+      '<div class="table-wrap"><table><thead><tr><th>อาการที่พบ</th><th>วันที่ซ่อม</th><th>ช่างผู้ดำเนินการ</th><th>สถานะ</th><th>Service No.</th><th>รายละเอียด</th><th></th></tr></thead><tbody>'+
+      c.repairs.map((r,i)=>'<tr><td data-label="อาการที่พบ">'+r.issue+'</td><td data-label="วันที่ซ่อม">'+r.date+'</td><td data-label="ช่างผู้ดำเนินการ">'+r.tech+'</td><td data-label="สถานะ">'+statusBadge(r.status)+'</td><td data-label="Service No.">'+r.service+'</td><td data-label="รายละเอียด">'+r.detail+'</td>'+rowActionsHtml('repair', i)+'</tr>').join('')+
+      '</tbody></table></div>';
+  }
+}
+
+function rowActionsHtml(type, index){
+  return '<td data-label=""><div class="row-actions">'+
+    '<div class="icon-btn" title="แก้ไข" onclick="editRecord(\''+type+'\', '+index+')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>'+
+    '<div class="icon-btn danger" title="ลบ" onclick="deleteRecord(\''+type+'\', '+index+')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg></div>'+
+  '</div></td>';
+}
+
+function arrKeyFor(type){ return type==='repair' ? 'repairs' : type; }
+
+function editRecord(type, index){ openModal(type, index); }
+
+function deleteRecord(type, index){
+  if(!confirm('ยืนยันการลบรายการนี้?')) return;
+  customers[activeCustomer][arrKeyFor(type)].splice(index, 1);
+  renderCustomerList();
+  renderMain();
+}
+
+const formConfigs = {
+  appointments: { title:'นัดหมาย', sub:'สำหรับลูกค้าที่เลือกอยู่', fields:[
+    {label:'วันที่', key:'date', type:'text', placeholder:'เช่น 15 ก.ย. 2569'},
+    {label:'เวลา', key:'time', type:'text', placeholder:'เช่น 09:30 น.'},
+    {label:'รายละเอียด', key:'detail', type:'textarea'},
+    {label:'Service No.', key:'service', type:'text', placeholder:'SV-2569-XXXX'},
+    {label:'สถานะ', key:'status', type:'select', options:['รอยืนยัน','ยืนยันแล้ว']}
+  ]},
+  machines: { title:'เครื่องจักร', sub:'สำหรับลูกค้าที่เลือกอยู่', fields:[
+    {label:'รุ่นเครื่อง', key:'model', type:'text'},
+    {label:'Serial Number', key:'serial', type:'text'},
+    {label:'วันที่เริ่มรับประกัน', key:'warranty', type:'text', placeholder:'เช่น 10 ม.ค. 2568'},
+    {label:'ประเภทห้องเย็น', key:'roomType', type:'select', options:['ห้องเย็นควบคุมอุณหภูมิ','ห้องแช่แข็ง']},
+    {label:'น้ำยาที่ใช้', key:'refrigerant', type:'text'},
+    {label:'รูปเพลตเครื่อง', key:'photo', type:'file'},
+    {label:'อื่นๆ', key:'notes', type:'textarea'}
+  ]},
+  repair: { title:'บันทึกการซ่อม', sub:'สำหรับลูกค้าที่เลือกอยู่', fields:[
+    {label:'อาการที่พบ', key:'issue', type:'textarea'},
+    {label:'วันที่ซ่อม', key:'date', type:'text', placeholder:'เช่น 2 ก.ย. 2569'},
+    {label:'ช่างผู้ดำเนินการ', key:'tech', type:'text'},
+    {label:'สถานะ', key:'status', type:'select', options:['กำลังดำเนินการ','เสร็จสิ้น']},
+    {label:'Service No.', key:'service', type:'text'},
+    {label:'รายละเอียด', key:'detail', type:'textarea'},
+    {label:'รูปใบงาน', key:'photo', type:'file'}
+  ]},
+  newCustomer: { title:'เพิ่มลูกค้าใหม่', sub:'สร้างโฟลเดอร์ลูกค้าและบัญชีล็อกอินในขั้นตอนเดียว', fields:[
+    {label:'ชื่อลูกค้า', key:'name', type:'text'},
+    {label:'ชื่อบริษัท', key:'company', type:'text'},
+    {label:'เบอร์โทร', key:'phone', type:'text'},
+    {label:'Username', key:'username', type:'text', placeholder:'ใช้สำหรับล็อกอิน'},
+    {label:'อีเมล', key:'email', type:'email'},
+    {label:'ตั้งรหัสผ่าน', key:'password', type:'password', placeholder:'ตั้งรหัสผ่านเริ่มต้นให้ลูกค้า'},
+    {label:'รหัสลูกค้า', key:'custId', type:'text', placeholder:'เช่น CUST-00230'}
+  ]},
+  editCustomer: { title:'แก้ไขข้อมูลลูกค้า', sub:'อัปเดตข้อมูลติดต่อของลูกค้า', fields:[
+    {label:'ชื่อลูกค้า', key:'name', type:'text'},
+    {label:'ชื่อบริษัท', key:'company', type:'text'},
+    {label:'เบอร์โทร', key:'phone', type:'text'},
+    {label:'อีเมล', key:'email', type:'email'}
+  ]},
+  setPassword: { title:'ตั้งรหัสผ่านใหม่', sub:'กำหนดรหัสผ่านใหม่ให้ลูกค้าโดยตรงจากฝั่งแอดมิน', fields:[
+    {label:'รหัสผ่านใหม่', key:'newPassword', type:'password', placeholder:'อย่างน้อย 8 ตัวอักษร'},
+    {label:'ยืนยันรหัสผ่านใหม่', key:'confirmPassword', type:'password'}
+  ]}
+};
+
+function getRecordFor(type, index){
+  if(type==='editCustomer') return customers[activeCustomer];
+  if(type==='newCustomer' || type==='setPassword') return null;
+  if(index==null) return null;
+  return customers[activeCustomer][arrKeyFor(type)][index];
+}
+
+function openModal(type, index){
+  modalContext = { type, index: (index===undefined ? null : index) };
+  const cfg = formConfigs[type];
+  const record = getRecordFor(type, modalContext.index);
+
+  let fieldsHtml = cfg.fields.map(f=>{
+    const val = record && record[f.key]!=null ? record[f.key] : '';
+    if(f.type==='textarea'){
+      return '<div class="form-group"><label class="form-label">'+f.label+'</label><textarea class="form-textarea" id="field_'+f.key+'" placeholder="'+(f.placeholder||'')+'">'+val+'</textarea></div>';
+    }
+    if(f.type==='select'){
+      const opts = f.options.map(o=>'<option'+(o===val?' selected':'')+'>'+o+'</option>').join('');
+      return '<div class="form-group"><label class="form-label">'+f.label+'</label><select class="form-select" id="field_'+f.key+'">'+opts+'</select></div>';
+    }
+    if(f.type==='file'){
+      return '<div class="form-group"><label class="form-label">'+f.label+'</label><input class="form-input" type="file" id="field_'+f.key+'"></div>';
+    }
+    return '<div class="form-group"><label class="form-label">'+f.label+'</label><input class="form-input" type="'+f.type+'" id="field_'+f.key+'" placeholder="'+(f.placeholder||'')+'" value="'+val+'"></div>';
+  }).join('');
+
+  const titlePrefix = (modalContext.index!=null && type!=='editCustomer' && type!=='setPassword' && type!=='newCustomer') ? 'แก้ไข' : (type==='newCustomer' ? 'เพิ่ม' : '');
+  document.getElementById('modalBody').innerHTML =
+    '<div class="modal-title">'+(titlePrefix?titlePrefix+cfg.title:cfg.title)+'</div>'+
+    '<div class="modal-sub">'+cfg.sub+'</div>'+
+    fieldsHtml+
+    '<div class="modal-actions"><button class="btn" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" onclick="saveModal()">บันทึก</button></div>';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+
+function saveModal(){
+  const type = modalContext.type;
+  const cfg = formConfigs[type];
+  const values = {};
+  cfg.fields.forEach(f=>{
+    if(f.type==='file') return;
+    const el = document.getElementById('field_'+f.key);
+    if(el) values[f.key] = el.value;
+  });
+
+  if(type==='newCustomer'){
+    customerCounter++;
+    const newId = 'c'+customerCounter;
+    const initials = (values.name||'ลค').replace(/^(คุณ|นาย|นาง|นางสาว)\s*/,'').trim().slice(0,2) || 'LC';
+    customers[newId] = {
+      name: values.name || 'ลูกค้าใหม่',
+      company: values.company || '-',
+      initials: initials,
+      username: values.username || '',
+      email: values.email || '',
+      custId: values.custId || ('CUST-'+(1000+customerCounter)),
+      phone: values.phone || '',
+      password: values.password || '',
+      appointments: [], machines: [], repairs: []
+    };
+    activeCustomer = newId;
+    activeTab = 'appointments';
+    renderCustomerList();
+    renderMain();
+  } else if(type==='editCustomer'){
+    const c = customers[activeCustomer];
+    c.name = values.name; c.company = values.company; c.phone = values.phone; c.email = values.email;
+    c.initials = (values.name||'').replace(/^(คุณ|นาย|นาง|นางสาว)\s*/,'').trim().slice(0,2) || c.initials;
+    renderCustomerList();
+    renderMain();
+  } else if(type==='setPassword'){
+    if(!values.newPassword){ alert('กรุณากรอกรหัสผ่านใหม่'); return; }
+    if(values.newPassword !== values.confirmPassword){ alert('รหัสผ่านทั้งสองช่องไม่ตรงกัน'); return; }
+    customers[activeCustomer].password = values.newPassword;
+    closeModal();
+    alert('ตั้งรหัสผ่านใหม่ให้ '+customers[activeCustomer].name+' เรียบร้อยแล้ว (ตัวอย่าง)');
+    return;
+  } else {
+    const arrKey = arrKeyFor(type);
+    const arr = customers[activeCustomer][arrKey];
+    if(modalContext.index!=null){
+      arr[modalContext.index] = Object.assign({}, arr[modalContext.index], values);
+    } else {
+      arr.push(values);
+    }
+    renderCustomerList();
+    renderMain();
+  }
+  closeModal();
+}
+
+renderCustomerList();
+renderMain();
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCzW6xGPOFCguUduw2OBaUAyD-AcaGEOIQ",
+    authDomain: "spm-intercool.firebaseapp.com",
+    projectId: "spm-intercool",
+    storageBucket: "spm-intercool.firebasestorage.app",
+    messagingSenderId: "536137022963",
+    appId: "1:536137022963:web:2cabaf19ae7566b1cfe686"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  function checkAdminAccess(user){
+    const errorBox = document.getElementById('authError');
+    if (!allowedAdminEmails.includes(user.email)) {
+      signOut(auth);
+      errorBox.textContent = 'บัญชี ' + user.email + ' ไม่ได้รับอนุญาตให้เข้าถึงระบบแอดมิน กรุณาติดต่อผู้ดูแลระบบ';
+      errorBox.classList.add('show');
+      return;
+    }
+    errorBox.classList.remove('show');
+    document.getElementById('adminEmail').textContent = user.email;
+    document.getElementById('adminAvatar').textContent = user.email.charAt(0).toUpperCase();
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('appRoot').classList.remove('hidden');
+  }
+
+  window.signInWithGoogle = function(){
+    signInWithPopup(auth, provider)
+      .then((result) => checkAdminAccess(result.user))
+      .catch((err) => {
+        if (err.code !== 'auth/popup-closed-by-user') {
+          alert('เข้าสู่ระบบไม่สำเร็จ: ' + err.message);
+        }
+      });
+  };
+
+  window.signOutAdmin = function(){
+    signOut(auth).then(() => {
+      document.getElementById('appRoot').classList.add('hidden');
+      document.getElementById('authScreen').classList.remove('hidden');
+      document.getElementById('authError').classList.remove('show');
+    });
+  };
+
+  // Keeps the admin signed in across page refreshes
+  onAuthStateChanged(auth, (user) => {
+    if (user) checkAdminAccess(user);
+  });
+</script>
+
+</body>
+</html>
